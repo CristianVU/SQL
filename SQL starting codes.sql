@@ -7,6 +7,23 @@ score DECIMAL NOT NULL,
 student_id INT NOT NULL,
 CONSTRAINT FK_student_id FOREIGN KEY (student_id) REFERENCES students(id))
 
+/* CREATE TABLE WITH VALUES */
+CREATE TABLE IF NOT EXISTS people(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    surname VARCHAR(50),
+    birthdate VARCHAR(50),
+    number_of_children INT
+);
+
+INSERT INTO people(name,surname,birthdate,number_of_children)
+VALUES
+('Paul','Motchkovich','1990-08-13',0),
+('Charlotte','Dupuis','1986-11-05',2),
+('Clara','Milaux','1976-02-12',3);
+
+SELECT * FROM people
+
 
 /* ALTER TABLE TO ADD A FOREIGN KEY */
 
@@ -142,14 +159,30 @@ FROM restaurants
 INNER JOIN reviews ON restaurants.id = reviews.restaurant_id
 WHERE restaurants.name = 'Ichiran'
 
-/* SELECT FUNCTION WITH 2 CONDITIONS */
+/* SELECT FUNCTION WITH 2 CONDITIONS (AND or OR) */
 SELECT *
 FROM restaurants
 WHERE name LIKE '%Cafe%'
 AND city='Paris'
+
+SELECT * FROM people
+WHERE name = 'Clara' OR number_of_children = 0
 
 /*Count all restaurants per city and then sort them by counter (ORDER) */
 SELECT city, COUNT(*) AS counter
 FROM restaurants
 GROUP by city
 ORDER by counter DESC
+
+/* USE OF LIKE with % :
+C% : starts with 'C'
+%C : finishes with 'C'
+%C% : contains 'C' 
+_C% : 'C' as second letter */
+
+/* SELECT + rename column */
+SELECT 'column name' AS 'new name' FROM 'table name'
+
+/* ORDER by 2 columns */
+SELECT name,birthdate FROM people
+ORDER BY birthdate DESC, name ASC

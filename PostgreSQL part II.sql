@@ -37,13 +37,29 @@ LIMIT integer
 
 /* Aggregative functions */
 
-SELECT COUNT(*), column 
+SELECT COUNT(*), column /* it counts allso NULL rows */
 FROM table
 GROUP BY column
 
-SELECT SUM(column1), column2
+/* to not count NULL rows: */
+SELECT COUNT(column) FROM tablename
+
+/*COUNT IF */
+SELECT COUNTIF(column > number) FROM tablename /* We can use also AND/OR */
+
+SELECT SUM(column1), column2, etc.
 FROM table
 GROUP BY column2
+
+/* MAX and MIN */
+SELECT MAX(column) FROM table
+
+SELECT MIN(column) FROM table
+
+SELECT MAX(column1), MIN(column2) FROM table
+
+/* AVERAGE */
+SELECT AVG(column) FROM table
 
 /* JOIN OF THREE TABLES */
 SELECT COUNT(movies.id), genres.name AS genre_name
@@ -69,4 +85,83 @@ HAVING ROUND(EXTRACT(epoch FROM age(_camp_start_at,birthday)) / (3600*24*365)) >
 AND ROUND(EXTRACT(epoch FROM age(_camp_start_at,birthday)) / (3600*24*365)) < 90
 ORDER BY 1
 
+/* WHERE + IN */
+SELECT * FROM tablename
+WHERE name IN ('Paul','Harris','Victor')
 
+/* BETWEEN */
+SELECT * FROM tablename
+WHERE age BETWEEN 10 AND 50   /* also: WHERE age >= 10 AND <= 50 */
+
+/* ORDER with numbers */
+SELECT name, surname, birth_date, number_of_children 
+FROM People
+ORDER BY 4 DESC, 2 ASC
+
+/* SELECT DISCTINCT : The SELECT DISTINCT statement is used to return only distinct (different) values. */
+/* Example: Select all the different countries from the "Customers" table: */
+SELECT DISTINCT Country FROM Customers;
+
+/* Inside a table, a column often contains many duplicate values; and sometimes you only want to list the different (distinct) values. */
+SELECT DISTINCT column1, column2, ...
+FROM table_name;
+
+/* COUNT DISTINCT */
+SELECT COUNT(DISTINCT Country) FROM Customers; /* return the number of different countries */
+
+SELECT Count(*) AS DistinctCountries
+FROM (SELECT DISTINCT Country FROM Customers);
+
+/* NULL VALUES */
+SELECT column_names
+FROM table_name
+WHERE column_name IS NULL;
+
+SELECT column_names
+FROM table_name
+WHERE column_name IS NOT NULL;
+
+/* SELECT DISTINCT + NULL VALUES (rows with null values for a column) */
+SELECT DISTINCT node_id
+FROM shapr.node_human
+WHERE industry IS NULL
+
+/* Aggregation functions per group (a priori filter) */
+SELECT buyer, SUM(spend) FROM purchases
+GROUP BY buyer /* We can see how much spend each buyer */
+
+/* a posteriori filter (filter by a codition) */
+SELECT buyer, SUM(spend) AS totalspend FROM purchases
+GROUP BY buyer
+HAVING totalspend > 10
+
+/* DATE_PARSE. The date function used to parse a date or datetime value, according to a given format string: */
+SELECT DATE_PARSE("2018/01/02", "yyyy/MM/dd")
+
+/* EXTRACT: */
+SELECT EXTRACT(MONTH from date) AS month, SUM(spend) AS totalspend   /* Can be YEAR, WEEK, DAYOFWEEK, etc. Can use also the function DATE() */
+FROM purchases
+GROUP BY 1
+
+/* WITH: */
+WITH buyer_quantities_over_10 AS (
+    SELECT buyer, SUM(quantity) AS totalquantity FROM purchases
+    GROUP BY buyer
+    HAVING totalquantity > 10 
+)
+
+SELECT COUNT(buyer)
+FROM buyer_quantities_over_10
+
+/* JOINS: */
+LEFT JOIN
+INNER JOIN
+RIGHT JOIN
+OUTER JOIN /* can see everything from both tables */
+
+/* MORE THAN ONE JOIN: */
+SELECT bu.name,pr.name, SUM(pu.quantity) AS totalquantity FROM purchases AS pu
+INNER JOIN buyers AS bu ON pu.buyer_id = bu.id
+INNER JOIN products AS pr ON pu.product_id = pr.id
+GROUP BY 1,2
+ORDER BY 1,2
